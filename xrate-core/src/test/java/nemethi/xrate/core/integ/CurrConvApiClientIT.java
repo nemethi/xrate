@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CurrConvApiClientIT {
 
-    private static final String FROM_CURRENCY = "USD";
-    private static final String TO_CURRENCY = "GBP";
+    private static final Currency FROM_CURRENCY = Currency.getInstance("USD");
+    private static final Currency TO_CURRENCY = Currency.getInstance("GBP");
     private static final BigDecimal EXPECTED_RATE = new BigDecimal("0.71584823");
     private static final String API_KEY = "testApiKey";
     private static final String CONTENT_TYPE_HEADER_KEY = "Content-Type";
@@ -44,8 +44,8 @@ public class CurrConvApiClientIT {
 
     @BeforeEach
     void initialize() {
-        client = new CurrConvApiClient(Currency.getInstance(FROM_CURRENCY), Currency.getInstance(TO_CURRENCY), API_KEY);
-        client.setEndpointUri(String.format("http://localhost:%s", mockWebServer.getPort()));
+        String endpointUri = String.format("http://localhost:%s", mockWebServer.getPort());
+        client = new CurrConvApiClient(endpointUri);
     }
 
     @Nested
@@ -55,7 +55,7 @@ public class CurrConvApiClientIT {
         void clientReturnsConversionRate() throws InterruptedException {
             mockWebServer.enqueue(mockResponse());
 
-            Optional<BigDecimal> result = client.getConversionRate();
+            Optional<BigDecimal> result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
 
             assertThat(result)
                     .isPresent()
@@ -83,7 +83,7 @@ public class CurrConvApiClientIT {
         void serverErrorResponse() throws InterruptedException {
             mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
-            Optional<BigDecimal> result = client.getConversionRate();
+            Optional<BigDecimal> result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
 
             assertThat(result).isNotPresent();
             verifyRequest(mockWebServer.takeRequest());
@@ -94,7 +94,7 @@ public class CurrConvApiClientIT {
         void invalidResponse() throws InterruptedException {
             mockWebServer.enqueue(mockResponse());
 
-            Optional<BigDecimal> result = client.getConversionRate();
+            Optional<BigDecimal> result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
 
             assertThat(result).isNotPresent();
             verifyRequest(mockWebServer.takeRequest());
