@@ -18,7 +18,10 @@ import static java.util.Objects.requireNonNull;
 public class ConversionResult {
 
     private static final int PRECISION = 3;
-    private static final MathContext MATH_CONTEXT = new MathContext(PRECISION, RoundingMode.HALF_EVEN);
+    /**
+     * Contains information about precision and rounding mode for numerical operations.
+     */
+    public static final MathContext MATH_CONTEXT = new MathContext(PRECISION, RoundingMode.HALF_EVEN);
 
     private final Currency from;
     private final Currency to;

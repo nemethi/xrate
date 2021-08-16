@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 /**
- * Converts an amount of money from a currency to another currency, perhaps using a third-party service.
+ * Converts an amount of money from a currency to another currency, possibly using a third-party service.
  */
 public interface CurrencyConverter {
 
@@ -14,16 +14,15 @@ public interface CurrencyConverter {
      * Converts the specified amount from a currency to another currency.
      * Returns the result of the conversion as a {@link ConversionResult}.
      * The returned value must never be null.
-     * <p>
-     * This method is free to throw an unchecked exception if any error occurs.
      *
      * @param from   the currency converted from
      * @param to     the currency converted to
      * @param amount the amount converted
      * @return the result of the conversion
+     * @throws ConversionException if any error occurs
      */
     @NotNull
-    ConversionResult convert(@NotNull Currency from, @NotNull Currency to, @NotNull BigDecimal amount);
+    ConversionResult convert(@NotNull Currency from, @NotNull Currency to, @NotNull BigDecimal amount) throws ConversionException;
 
     /**
      * Sets the credentials used for authentication, if there is any.
