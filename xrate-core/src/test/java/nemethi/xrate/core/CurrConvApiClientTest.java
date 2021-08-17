@@ -68,6 +68,15 @@ class CurrConvApiClientTest {
     }
 
     @Test
+    void returnsEmptyOptionalOnMalformedEndpointUri() {
+        client = new CurrConvApiClient("[malformed");
+
+        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+
+        assertThat(result).isNotPresent();
+    }
+
+    @Test
     void returnsEmptyOptionalOnHttpClientError() throws Exception {
         when(httpClient.send(any(), any())).thenThrow(IOException.class);
 

@@ -34,14 +34,12 @@ public class CurrConvApiClient {
     }
 
     public Optional<BigDecimal> getConversionRate(Currency from, Currency to, String apiKey) {
-        String fromCurrency = from.getCurrencyCode();
-        String toCurrency = to.getCurrencyCode();
-        URI uri = buildUri(fromCurrency, toCurrency, apiKey);
-        return getConversionRate(fromCurrency, toCurrency, uri);
+        return getConversionRate(from.getCurrencyCode(), to.getCurrencyCode(), apiKey);
     }
 
-    private Optional<BigDecimal> getConversionRate(String fromCurrency, String toCurrency, URI uri) {
+    private Optional<BigDecimal> getConversionRate(String fromCurrency, String toCurrency, String apiKey) {
         try {
+            URI uri = buildUri(fromCurrency, toCurrency, apiKey);
             HttpRequest request = HttpRequest.newBuilder(uri).build();
             BigDecimal result = sendRequest(request, fromCurrency, toCurrency);
             return Optional.of(result);
