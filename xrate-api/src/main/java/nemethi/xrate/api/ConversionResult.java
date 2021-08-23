@@ -55,7 +55,7 @@ public class ConversionResult {
      * @return the quotient of <code>result</code> divided by <code>amount</code>
      */
     public BigDecimal getRate() {
-        return result.divideToIntegralValue(amount, MATH_CONTEXT);
+        return result.divide(amount, MATH_CONTEXT);
     }
 
     /**
@@ -67,7 +67,7 @@ public class ConversionResult {
      * @return the quotient of <code>amount</code> divided by <code>result</code>
      */
     public BigDecimal getInverseRate() {
-        return amount.divideToIntegralValue(result, MATH_CONTEXT);
+        return amount.divide(result, MATH_CONTEXT);
     }
 
     /**
