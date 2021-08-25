@@ -14,15 +14,10 @@ import java.util.Optional;
 
 public class CurrConvApiClient {
 
-    private static final String API_ENDPOINT = "https://free.currconv.com/api/v7/convert";
     private static final String QUERY_PARAMS_TEMPLATE = "%s?q=%s_%s&apiKey=%s&compact=ultra";
 
     private final String endpointUri;
     private final HttpClient httpClient;
-
-    public CurrConvApiClient() {
-        this(API_ENDPOINT, HttpClient.newHttpClient());
-    }
 
     public CurrConvApiClient(String endpointUri) {
         this(endpointUri, HttpClient.newHttpClient());

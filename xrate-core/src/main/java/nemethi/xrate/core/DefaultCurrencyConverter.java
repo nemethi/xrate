@@ -14,11 +14,7 @@ public class DefaultCurrencyConverter implements CurrencyConverter {
     private final CurrConvApiClient client;
     private String authCredentials;
 
-    public DefaultCurrencyConverter() {
-        this(new CurrConvApiClient());
-    }
-
-    DefaultCurrencyConverter(CurrConvApiClient client) {
+    public DefaultCurrencyConverter(CurrConvApiClient client) {
         this.client = client;
     }
 
