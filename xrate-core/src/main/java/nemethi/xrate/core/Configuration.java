@@ -11,6 +11,7 @@ public class Configuration {
 
     private static final String CURR_CONV_ENDPOINT = "https://free.currconv.com/api/v7/convert";
     private static final String EMPTY_STRING = "";
+    private static final String CORE_ENDPOINT_KEY = "xrate.core.endpoint";
     private static final String CORE_AUTH_KEY = "xrate.core.auth";
 
     private final Properties properties;
@@ -38,7 +39,7 @@ public class Configuration {
     }
 
     public String getCurrConvEndpoint() {
-        return CURR_CONV_ENDPOINT;
+        return properties.getProperty(CORE_ENDPOINT_KEY, CURR_CONV_ENDPOINT);
     }
 
     public String getCoreAuthCredentials() {

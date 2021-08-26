@@ -14,8 +14,8 @@ class ConfigurationIT {
     private static final String CORE_AUTH_CREDS = "testCoreAuthCreds";
     private static final String CONFIG_FILENAME = "/config-it.properties";
     private static final String MISSING_CONFIG_FILENAME = "/missing-config.properties";
-    private static final String ERROR_MESSAGE = String.format("Cannot load configuration: %s", MISSING_CONFIG_FILENAME);
-    private static final String ROOT_CAUSE_ERROR_MESSAGE = String.format("Resource %s is not found", MISSING_CONFIG_FILENAME);
+    private static final String ERROR_MESSAGE = "Cannot load configuration: %s";
+    private static final String ROOT_CAUSE_ERROR_MESSAGE = "Resource %s is not found";
 
     @Test
     void loadsConfigFromClasspath() {
@@ -29,7 +29,7 @@ class ConfigurationIT {
 
         assertThat(thrown)
                 .isInstanceOf(UncheckedIOException.class)
-                .hasMessage(ERROR_MESSAGE)
+                .hasMessage(ERROR_MESSAGE, MISSING_CONFIG_FILENAME)
                 .hasRootCauseInstanceOf(IOException.class)
                 .hasRootCauseMessage(ROOT_CAUSE_ERROR_MESSAGE, MISSING_CONFIG_FILENAME);
     }
