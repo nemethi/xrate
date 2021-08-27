@@ -1,6 +1,7 @@
 package nemethi.xrate.core;
 
 import nemethi.xrate.api.ConversionResult;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,10 +24,19 @@ class ResultPrinterTest {
     private static final String RESULT_FORMAT = "%s %s = %s %s";
     private static final String RATE_FORMAT = "1 %s = %s %s";
 
+    @Mock
+    private PrintWriter writer;
+
+    private ResultPrinter printer;
+
+    @BeforeEach
+    void setUp() {
+        printer = new ResultPrinter(writer);
+    }
 
     @Test
-    void print(@Mock PrintWriter writer) {
-        new ResultPrinter().print(writer, CONVERSION_RESULT);
+    void print() {
+        printer.print(CONVERSION_RESULT);
 
         verify(writer).println(formattedResult());
         verify(writer).println(formattedRate());
