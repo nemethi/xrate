@@ -1,8 +1,9 @@
 package nemethi.xrate.core;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.util.Properties;
 
 import static java.util.Objects.isNull;
@@ -16,22 +17,30 @@ public class Configuration {
 
     private final Properties properties;
 
-    public Configuration(String configFilename) {
+    public Configuration(String configFilePath) throws ConfigurationException {
         properties = new Properties();
         try {
-            properties.load(getResourceAsStream(configFilename));
+            properties.load(findConfigFile(configFilePath));
         } catch (IOException e) {
-            String message = String.format("Cannot load configuration: %s", configFilename);
-            throw new UncheckedIOException(message, e);
+            String message = String.format("Cannot load configuration: %s", configFilePath);
+            throw new ConfigurationException(message, e);
         }
     }
 
-    private InputStream getResourceAsStream(String resource) throws IOException {
-        InputStream stream = getClass().getResourceAsStream(resource);
-        if (isNull(stream)) {
-            throw new IOException(String.format("Resource %s is not found", resource));
+    private InputStream findConfigFile(String configFilePath) throws FileNotFoundException {
+        InputStream config = findConfigOnClasspath(configFilePath);
+        if (isNull(config)) {
+            return findConfigInFileSystem(configFilePath);
         }
-        return stream;
+        return config;
+    }
+
+    private InputStream findConfigOnClasspath(String configFilePath) {
+        return getClass().getClassLoader().getResourceAsStream(configFilePath);
+    }
+
+    private InputStream findConfigInFileSystem(String configFilePath) throws FileNotFoundException {
+        return new FileInputStream(configFilePath);
     }
 
     Configuration(Properties properties) {
