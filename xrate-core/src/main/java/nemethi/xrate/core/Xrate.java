@@ -13,8 +13,7 @@ public class Xrate {
     private final ResultPrinter printer;
 
     public Xrate(Configuration config, PrintWriter writer) {
-        this.config = config;
-        this.printer = new ResultPrinter(writer);
+        this(config, new ResultPrinter(writer));
     }
 
     Xrate(Configuration config, ResultPrinter printer) {
