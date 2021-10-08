@@ -13,11 +13,12 @@ import static java.util.Objects.nonNull;
 public class ExceptionHandler implements IParameterExceptionHandler, IExecutionExceptionHandler {
 
     private static final String ERROR_MESSAGE_FORMAT = "%s: %s";
+    private static final String ERROR_MESSAGE_WITH_CAUSE_FORMAT = "%s%n%s";
 
     @Override
     public int handleParseException(ParameterException exception, String[] args) {
         CommandLine commandLine = exception.getCommandLine();
-        printErrorMessage(exception, commandLine);
+        printErrorMessage(exception.getMessage(), commandLine);
         printUsage(exception, commandLine);
         return getExitCodeForInvalidInput(exception, commandLine);
     }
@@ -44,12 +45,22 @@ public class ExceptionHandler implements IParameterExceptionHandler, IExecutionE
 
     @Override
     public int handleExecutionException(Exception exception, CommandLine commandLine, ParseResult parseResult) {
-        printErrorMessage(exception, commandLine);
+        if (causeMessageIsNonNull(exception.getCause())) {
+            String message = String.format(ERROR_MESSAGE_WITH_CAUSE_FORMAT, exception.getMessage(),
+                    exception.getCause().getMessage());
+            printErrorMessage(message, commandLine);
+        } else {
+            printErrorMessage(exception.getMessage(), commandLine);
+        }
         return getExitCodeForExecutionException(exception, commandLine);
     }
 
-    private void printErrorMessage(Exception exception, CommandLine commandLine) {
-        String errorMessage = String.format(ERROR_MESSAGE_FORMAT, commandLine.getCommandName(), exception.getMessage());
+    private boolean causeMessageIsNonNull(Throwable cause) {
+        return nonNull(cause) && nonNull(cause.getMessage());
+    }
+
+    private void printErrorMessage(String message, CommandLine commandLine) {
+        String errorMessage = String.format(ERROR_MESSAGE_FORMAT, commandLine.getCommandName(), message);
         commandLine.getErr().println(commandLine.getColorScheme().errorText(errorMessage));
     }
 

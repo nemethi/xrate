@@ -30,7 +30,9 @@ class ExceptionHandlerTest {
 
     private static final String COMMAND_NAME = "testCommandName";
     private static final String EXCEPTION_MESSAGE = "testExceptionMessage";
+    private static final String CAUSE_MESSAGE = "testCauseMessage";
     private static final String ERROR_MESSAGE = String.format("%s: %s", COMMAND_NAME, EXCEPTION_MESSAGE);
+    private static final String ERROR_MESSAGE_WITH_CAUSE = String.format("%s: %s%n%s", COMMAND_NAME, EXCEPTION_MESSAGE, CAUSE_MESSAGE);
     private static final int INVALID_PARAMETER_EXIT_CODE = 2;
     private static final int EXECUTION_EXCEPTION_EXIT_CODE = 1;
     private static final String[] EMPTY_ARRAY = new String[0];
@@ -38,7 +40,7 @@ class ExceptionHandlerTest {
     @Mock
     private ParameterException parameterException;
     @Mock
-    private Exception executionException;
+    private Exception executionException, cause;
     @Mock
     private CommandLine commandLine;
     @Mock
@@ -192,8 +194,8 @@ class ExceptionHandlerTest {
         @DisplayName("Handle execution exception and return the exit code" +
                 " provided by the exception mapper")
         void handleExecutionExceptionWithExceptionMapper() {
-            when(commandLine.getCommandName()).thenReturn(COMMAND_NAME);
             when(executionException.getMessage()).thenReturn(EXCEPTION_MESSAGE);
+            when(commandLine.getCommandName()).thenReturn(COMMAND_NAME);
             when(commandLine.getErr()).thenReturn(errorWriter);
             when(commandLine.getColorScheme()).thenReturn(colorScheme);
             when(colorScheme.errorText(anyString())).thenReturn(text);
@@ -203,8 +205,8 @@ class ExceptionHandlerTest {
             int exitCode = exceptionHandler.handleExecutionException(executionException, commandLine, parseResult);
 
             assertThat(exitCode).isEqualTo(EXECUTION_EXCEPTION_EXIT_CODE);
-            verify(commandLine).getCommandName();
             verify(executionException).getMessage();
+            verify(commandLine).getCommandName();
             verify(commandLine).getErr();
             verify(commandLine).getColorScheme();
             verify(colorScheme).errorText(ERROR_MESSAGE);
@@ -216,8 +218,9 @@ class ExceptionHandlerTest {
         @Test
         @DisplayName("Handle execution exception and return the exit code for execution error")
         void handleExecutionExceptionWithoutExceptionMapper() {
-            when(commandLine.getCommandName()).thenReturn(COMMAND_NAME);
+            when(executionException.getCause()).thenReturn(cause);
             when(executionException.getMessage()).thenReturn(EXCEPTION_MESSAGE);
+            when(commandLine.getCommandName()).thenReturn(COMMAND_NAME);
             when(commandLine.getErr()).thenReturn(errorWriter);
             when(commandLine.getColorScheme()).thenReturn(colorScheme);
             when(colorScheme.errorText(anyString())).thenReturn(text);
@@ -228,12 +231,72 @@ class ExceptionHandlerTest {
             int exitCode = exceptionHandler.handleExecutionException(executionException, commandLine, parseResult);
 
             assertThat(exitCode).isEqualTo(EXECUTION_EXCEPTION_EXIT_CODE);
-            verify(commandLine).getCommandName();
+            verify(executionException).getCause();
             verify(executionException).getMessage();
+            verify(commandLine).getCommandName();
             verify(commandLine).getErr();
             verify(commandLine).getColorScheme();
             verify(colorScheme).errorText(ERROR_MESSAGE);
             verify(errorWriter).println(text);
+            verify(commandLine).getExitCodeExceptionMapper();
+            verify(commandLine).getCommandSpec();
+            verify(commandSpec).exitCodeOnExecutionException();
+        }
+
+        @Test
+        @DisplayName("Handle execution exception that has a cause and return the exit code" +
+                " provided by the exception mapper")
+        void handleExecutionExceptionWithCauseAndWithExceptionMapper() {
+            when(executionException.getCause()).thenReturn(cause);
+            when(cause.getMessage()).thenReturn(CAUSE_MESSAGE);
+            when(executionException.getMessage()).thenReturn(EXCEPTION_MESSAGE);
+            when(commandLine.getCommandName()).thenReturn(COMMAND_NAME);
+            when(commandLine.getErr()).thenReturn(errorWriter);
+            when(commandLine.getColorScheme()).thenReturn(colorScheme);
+            when(colorScheme.errorText(anyString())).thenReturn(text);
+            when(commandLine.getExitCodeExceptionMapper()).thenReturn(exceptionMapper);
+            when(exceptionMapper.getExitCode(any())).thenReturn(EXECUTION_EXCEPTION_EXIT_CODE);
+
+            int exitCode = exceptionHandler.handleExecutionException(executionException, commandLine, parseResult);
+
+            assertThat(exitCode).isEqualTo(EXECUTION_EXCEPTION_EXIT_CODE);
+            verify(executionException, times(2)).getCause();
+            verify(cause, times(2)).getMessage();
+            verify(executionException).getMessage();
+            verify(commandLine).getCommandName();
+            verify(commandLine).getErr();
+            verify(commandLine).getColorScheme();
+            verify(colorScheme).errorText(ERROR_MESSAGE_WITH_CAUSE);
+            verify(errorWriter).println(text);
+            verify(commandLine).getExitCodeExceptionMapper();
+            verify(exceptionMapper).getExitCode(executionException);
+        }
+
+        @Test
+        @DisplayName("Handle execution exception that has a cause" +
+                " and return the exit code for execution error")
+        void handleExecutionExceptionWithCauseAndWithoutExceptionMapper() {
+            when(executionException.getCause()).thenReturn(cause);
+            when(cause.getMessage()).thenReturn(CAUSE_MESSAGE);
+            when(executionException.getMessage()).thenReturn(EXCEPTION_MESSAGE);
+            when(commandLine.getCommandName()).thenReturn(COMMAND_NAME);
+            when(commandLine.getErr()).thenReturn(errorWriter);
+            when(commandLine.getColorScheme()).thenReturn(colorScheme);
+            when(colorScheme.errorText(anyString())).thenReturn(text);
+            when(commandLine.getExitCodeExceptionMapper()).thenReturn(null);
+            when(commandLine.getCommandSpec()).thenReturn(commandSpec);
+            when(commandSpec.exitCodeOnExecutionException()).thenReturn(EXECUTION_EXCEPTION_EXIT_CODE);
+
+            int exitCode = exceptionHandler.handleExecutionException(executionException, commandLine, parseResult);
+
+            assertThat(exitCode).isEqualTo(EXECUTION_EXCEPTION_EXIT_CODE);
+            verify(executionException, times(2)).getCause();
+            verify(cause, times(2)).getMessage();
+            verify(executionException).getMessage();
+            verify(commandLine).getCommandName();
+            verify(commandLine).getErr();
+            verify(commandLine).getColorScheme();
+            verify(colorScheme).errorText(ERROR_MESSAGE_WITH_CAUSE);
             verify(commandLine).getExitCodeExceptionMapper();
             verify(commandLine).getCommandSpec();
             verify(commandSpec).exitCodeOnExecutionException();
