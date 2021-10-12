@@ -14,6 +14,7 @@ public class Configuration {
     private static final String EMPTY_STRING = "";
     private static final String CORE_ENDPOINT_KEY = "xrate.core.endpoint";
     private static final String CORE_AUTH_KEY = "xrate.core.auth";
+    private static final String PLUGIN_AUTH_KEY = "xrate.plugin.auth";
 
     private final Properties properties;
 
@@ -53,5 +54,9 @@ public class Configuration {
 
     public String getCoreAuthCredentials() {
         return properties.getProperty(CORE_AUTH_KEY, EMPTY_STRING);
+    }
+
+    public String getPluginAuthCredentials() {
+        return properties.getProperty(PLUGIN_AUTH_KEY, EMPTY_STRING);
     }
 }

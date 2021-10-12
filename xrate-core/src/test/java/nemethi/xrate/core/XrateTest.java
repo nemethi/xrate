@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
@@ -32,10 +33,13 @@ class XrateTest {
     private static final ConversionResult CONVERSION_RESULT = new ConversionResult(FROM, TO, AMOUNT, RESULT);
     private static final String ENDPOINT = "testEndpoint";
     private static final String AUTH_CREDS = "testAuthCreds";
+    private static final String PLUGIN_AUTH_CREDS = "testPluginAuthCreds";
     private static final Exception EXPECTED_EXCEPTION = new ConversionException("testMessage");
 
     @Mock
     private Configuration config;
+    @Mock
+    private PluginLoader loader;
     @Mock
     private ResultPrinter printer;
     @Mock
@@ -45,11 +49,42 @@ class XrateTest {
 
     @BeforeEach
     void setUp() {
-        xrate = Mockito.spy(new Xrate(config, printer));
+        xrate = Mockito.spy(new Xrate(config, loader, printer));
     }
 
     @Test
-    void convert() {
+    void convertWithPlugin() {
+        when(loader.findFirstPlugin()).thenReturn(Optional.of(converter));
+        when(config.getPluginAuthCredentials()).thenReturn(PLUGIN_AUTH_CREDS);
+        when(converter.convert(any(), any(), any())).thenReturn(CONVERSION_RESULT);
+
+        xrate.convert(FROM, TO, AMOUNT);
+
+        verify(loader).findFirstPlugin();
+        verify(config).getPluginAuthCredentials();
+        verify(converter).setAuthCredentials(PLUGIN_AUTH_CREDS);
+        verify(converter).convert(FROM, TO, AMOUNT);
+        verify(printer).print(CONVERSION_RESULT);
+    }
+
+    @Test
+    void doesNotCatchExceptionOfPlugin() {
+        when(loader.findFirstPlugin()).thenReturn(Optional.of(converter));
+        when(config.getPluginAuthCredentials()).thenReturn(PLUGIN_AUTH_CREDS);
+        when(converter.convert(any(), any(), any())).thenThrow(EXPECTED_EXCEPTION);
+
+        Throwable thrown = catchThrowable(() -> xrate.convert(FROM, TO, AMOUNT));
+
+        assertThat(thrown).isEqualTo(EXPECTED_EXCEPTION);
+        verify(loader).findFirstPlugin();
+        verify(config).getPluginAuthCredentials();
+        verify(converter).setAuthCredentials(PLUGIN_AUTH_CREDS);
+        verify(converter).convert(FROM, TO, AMOUNT);
+    }
+
+    @Test
+    void convertWithDefaultConverter() {
+        when(loader.findFirstPlugin()).thenReturn(Optional.empty());
         when(config.getCurrConvEndpoint()).thenReturn(ENDPOINT);
         when(config.getCoreAuthCredentials()).thenReturn(AUTH_CREDS);
         doReturn(converter).when(xrate).createDefaultConverter(any(), anyString());
@@ -57,6 +92,7 @@ class XrateTest {
 
         xrate.convert(FROM, TO, AMOUNT);
 
+        verify(loader).findFirstPlugin();
         verify(config).getCurrConvEndpoint();
         verify(config).getCoreAuthCredentials();
         verify(xrate).createDefaultConverter(any(), eq(AUTH_CREDS));
@@ -65,7 +101,8 @@ class XrateTest {
     }
 
     @Test
-    void convertDoesNotCatchException() {
+    void doesNotCatchExceptionOfDefaultConverter() {
+        when(loader.findFirstPlugin()).thenReturn(Optional.empty());
         when(config.getCurrConvEndpoint()).thenReturn(ENDPOINT);
         when(config.getCoreAuthCredentials()).thenReturn(AUTH_CREDS);
         doReturn(converter).when(xrate).createDefaultConverter(any(), anyString());
@@ -74,6 +111,7 @@ class XrateTest {
         Throwable thrown = catchThrowable(() -> xrate.convert(FROM, TO, AMOUNT));
 
         assertThat(thrown).isEqualTo(EXPECTED_EXCEPTION);
+        verify(loader).findFirstPlugin();
         verify(config).getCurrConvEndpoint();
         verify(config).getCoreAuthCredentials();
         verify(xrate).createDefaultConverter(any(), eq(AUTH_CREDS));

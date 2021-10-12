@@ -22,6 +22,7 @@ class ConfigurationIT {
     private static final String CORE_AUTH_CONFIG_LINE = String.format("%s=%s", CORE_AUTH_KEY, CORE_AUTH_CREDS_2);
     private static final String CORE_ENDPOINT = "testCoreEndpoint";
     private static final String CURR_CONV_ENDPOINT = "https://free.currconv.com/api/v7/convert";
+    private static final String PLUGIN_AUTH_CREDS = "testPluginAuthCreds";
     private static final String CONFIG_FILENAME = "config-it.properties";
     private static final String CONFIG_FILENAME_2 = "config-it2.properties";
     private static final String MISSING_CONFIG_FILENAME = "/missing-config.properties";
@@ -36,6 +37,7 @@ class ConfigurationIT {
         Configuration config = new Configuration(CONFIG_FILENAME);
         assertThat(config.getCurrConvEndpoint()).isEqualTo(CORE_ENDPOINT);
         assertThat(config.getCoreAuthCredentials()).isEqualTo(CORE_AUTH_CREDS);
+        assertThat(config.getPluginAuthCredentials()).isEqualTo(PLUGIN_AUTH_CREDS);
     }
 
     @Test

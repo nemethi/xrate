@@ -14,6 +14,8 @@ class ConfigurationTest {
     private static final String CORE_AUTH_CREDS = "testCoreAuthCreds";
     private static final String CORE_ENDPOINT_KEY = "xrate.core.endpoint";
     private static final String CORE_ENDPOINT = "testCoreEndpoint";
+    private static final String PLUGIN_AUTH_KEY = "xrate.plugin.auth";
+    private static final String PLUGIN_AUTH_CREDS = "testPluginAuthCreds";
 
     private Configuration config;
     private Properties properties;
@@ -23,6 +25,7 @@ class ConfigurationTest {
         properties = new Properties();
         properties.setProperty(CORE_ENDPOINT_KEY, CORE_ENDPOINT);
         properties.setProperty(CORE_AUTH_KEY, CORE_AUTH_CREDS);
+        properties.setProperty(PLUGIN_AUTH_KEY, PLUGIN_AUTH_CREDS);
         config = new Configuration(properties);
     }
 
@@ -46,5 +49,16 @@ class ConfigurationTest {
     void getCoreAuthCredentialsReturnsEmptyStringByDefault() {
         properties.remove(CORE_AUTH_KEY);
         assertThat(config.getCoreAuthCredentials()).isEmpty();
+    }
+
+    @Test
+    void getPluginAuthCredentials() {
+        assertThat(config.getPluginAuthCredentials()).isEqualTo(PLUGIN_AUTH_CREDS);
+    }
+
+    @Test
+    void getPluginAuthCredentialsReturnsEmptyStringByDefault() {
+        properties.remove(PLUGIN_AUTH_KEY);
+        assertThat(config.getPluginAuthCredentials()).isEmpty();
     }
 }
