@@ -25,12 +25,8 @@ class ConfigurationIT {
     private static final String PLUGIN_AUTH_CREDS = "testPluginAuthCreds";
     private static final String CONFIG_FILENAME = "config-it.properties";
     private static final String CONFIG_FILENAME_2 = "config-it2.properties";
-    private static final String MISSING_CONFIG_FILENAME = "/missing-config.properties";
+    private static final String MISSING_CONFIG_FILENAME = "missing-config.properties";
     private static final String ERROR_MESSAGE = "Cannot load configuration: %s";
-    private static final String ROOT_CAUSE_ERROR_MESSAGE = "%s (No such file or directory)";
-
-    @TempDir
-    Path tempDir;
 
     @Test
     void loadsConfigFromClasspath() {
@@ -41,7 +37,7 @@ class ConfigurationIT {
     }
 
     @Test
-    void loadsConfigFromFileSystemIfNotOnClasspath() throws IOException {
+    void loadsConfigFromFileSystemIfNotOnClasspath(@TempDir Path tempDir) throws IOException {
         Path configFile = tempDir.resolve(CONFIG_FILENAME_2);
         Files.write(configFile, List.of(CORE_AUTH_CONFIG_LINE));
 
@@ -57,7 +53,7 @@ class ConfigurationIT {
         assertThat(thrown)
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessage(ERROR_MESSAGE, MISSING_CONFIG_FILENAME)
-                .hasRootCauseInstanceOf(FileNotFoundException.class)
-                .hasRootCauseMessage(ROOT_CAUSE_ERROR_MESSAGE, MISSING_CONFIG_FILENAME);
+                .hasRootCauseInstanceOf(FileNotFoundException.class);
+        assertThat(thrown.getCause()).hasMessageContaining(MISSING_CONFIG_FILENAME);
     }
 }

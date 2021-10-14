@@ -19,13 +19,20 @@ public class Configuration {
     private final Properties properties;
 
     public Configuration(String configFilePath) throws ConfigurationException {
-        properties = new Properties();
         try {
-            properties.load(findConfigFile(configFilePath));
+            properties = loadProperties(configFilePath);
         } catch (IOException e) {
             String message = String.format("Cannot load configuration: %s", configFilePath);
             throw new ConfigurationException(message, e);
         }
+    }
+
+    private Properties loadProperties(String configFilePath) throws IOException {
+        Properties props = new Properties();
+        InputStream configFile = findConfigFile(configFilePath);
+        props.load(configFile);
+        configFile.close();
+        return props;
     }
 
     private InputStream findConfigFile(String configFilePath) throws FileNotFoundException {
