@@ -1,0 +1,28 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+  <id>default</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <baseDirectory>xrate</baseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>${project.basedir}/..</directory>
+      <outputDirectory/>
+      <includes>
+        <include>README.md</include>
+        <include>LICENSE</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/distribution</directory>
+      <outputDirectory/>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src/assembly/plugins</directory>
+      <outputDirectory>/plugins</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>
