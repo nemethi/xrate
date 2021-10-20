@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>xrate</artifactId>
@@ -10,6 +11,10 @@
   <artifactId>xrate-core</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
+
+  <properties>
+    <main.class>nemethi.xrate.core.Application</main.class>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -62,6 +67,46 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>${main.class}</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>appassembler-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>assemble</goal>
+            </goals>
+            <configuration>
+              <assembleDirectory>${project.build.directory}/distribution</assembleDirectory>
+              <programs>
+                <program>
+                  <id>xrate</id>
+                  <mainClass>${main.class}</mainClass>
+                </program>
+              </programs>
+              <repositoryName>lib</repositoryName>
+              <repositoryLayout>flat</repositoryLayout>
+              <configurationDirectory>config</configurationDirectory>
+              <configurationSourceDirectory>${project.basedir}/src/main/resources</configurationSourceDirectory>
+              <copyConfigurationDirectory>true</copyConfigurationDirectory>
+              <licenseHeaderFile>${project.basedir}/../LICENSE</licenseHeaderFile>
+              <endorsedDir>plugins</endorsedDir>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
