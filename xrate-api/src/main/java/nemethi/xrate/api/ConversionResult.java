@@ -17,7 +17,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class ConversionResult {
 
-    private static final int PRECISION = 3;
+    private static final int NUMBER_OF_DECIMAL_PLACES = 2;
+    private static final int PRECISION = 0;
     /**
      * Contains information about precision and rounding mode for numerical operations.
      */
@@ -55,7 +56,7 @@ public class ConversionResult {
      * @return the quotient of <code>result</code> divided by <code>amount</code>
      */
     public BigDecimal getRate() {
-        return result.divide(amount, MATH_CONTEXT);
+        return result.divide(amount, NUMBER_OF_DECIMAL_PLACES, MATH_CONTEXT.getRoundingMode());
     }
 
     /**
@@ -67,7 +68,7 @@ public class ConversionResult {
      * @return the quotient of <code>amount</code> divided by <code>result</code>
      */
     public BigDecimal getInverseRate() {
-        return amount.divide(result, MATH_CONTEXT);
+        return amount.divide(result, NUMBER_OF_DECIMAL_PLACES, MATH_CONTEXT.getRoundingMode());
     }
 
     /**

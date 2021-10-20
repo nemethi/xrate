@@ -41,6 +41,9 @@ class ApplicationIT {
     private static final String CORE_ENDPOINT_CONFIG_LINE = "xrate.core.endpoint=http://localhost:2552";
     private static final String USAGE = "Usage: xrate [-hlV] [-c=<configFilePath>] FROM TO AMOUNT";
     private static final String DESCRIPTION = "Get exchange rates and convert currencies using third-party services.";
+    private static final String AMOUNT = "757.57";
+    private static final String EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION = "1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n";
+    private static final String EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION = AMOUNT + " EUR = 1,515.14 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n";
 
     private ByteArrayOutputStream systemOut;
     private ByteArrayOutputStream systemErr;
@@ -82,16 +85,16 @@ class ApplicationIT {
             Statement statement = () -> Application.main(args());
 
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION);
             assertThat(TestCurrencyConverter.getAuthCredentials()).isEqualTo(PLUGIN_API_KEY);
         }
 
         @Test
         void convertWithSpecifiedValues() throws Exception {
-            Statement statement = () -> Application.main(args("EUR", "HUF", "2.5"));
+            Statement statement = () -> Application.main(args("EUR", "HUF", AMOUNT));
 
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("2.5 EUR = 5.0 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION);
             assertThat(TestCurrencyConverter.getAuthCredentials()).isEqualTo(PLUGIN_API_KEY);
         }
 
@@ -102,7 +105,7 @@ class ApplicationIT {
 
             Statement statement = () -> Application.main(args("-c", configFile.toAbsolutePath().toString()));
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION);
             assertThat(TestCurrencyConverter.getAuthCredentials()).isEqualTo(PLUGIN_API_KEY_2);
         }
 
@@ -111,10 +114,10 @@ class ApplicationIT {
             Path configFile = tempDir.resolve(SPECIFIED_CONFIG_FILENAME);
             Files.write(configFile, List.of(PLUGIN_AUTH_CONFIG_LINE));
 
-            Statement statement = () -> Application.main(args("EUR", "HUF", "2.5", "--config", configFile.toAbsolutePath().toString()));
+            Statement statement = () -> Application.main(args("EUR", "HUF", AMOUNT, "--config", configFile.toAbsolutePath().toString()));
 
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("2.5 EUR = 5.0 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION);
             assertThat(TestCurrencyConverter.getAuthCredentials()).isEqualTo(PLUGIN_API_KEY_2);
         }
     }
@@ -141,17 +144,17 @@ class ApplicationIT {
             Statement statement = () -> Application.main(args());
 
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION);
             verifyRequest(mockWebServer.takeRequest(), "USD", "GBP", CORE_API_KEY);
         }
 
         @Test
         void convertWithSpecifiedValues() throws Exception {
             mockWebServer.enqueue(mockResponseFor("EUR", "HUF"));
-            Statement statement = () -> Application.main(args("EUR", "HUF", "2.5"));
+            Statement statement = () -> Application.main(args("EUR", "HUF", AMOUNT));
 
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("2.5 EUR = 5.0 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION);
             verifyRequest(mockWebServer.takeRequest(), "EUR", "HUF", CORE_API_KEY);
         }
 
@@ -163,7 +166,7 @@ class ApplicationIT {
 
             Statement statement = () -> Application.main(args("-c", configFile.toAbsolutePath().toString()));
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION);
             verifyRequest(mockWebServer.takeRequest(), "USD", "GBP", CORE_API_KEY_2);
         }
 
@@ -173,10 +176,10 @@ class ApplicationIT {
             Path configFile = tempDir.resolve(SPECIFIED_CONFIG_FILENAME);
             Files.write(configFile, List.of(CORE_ENDPOINT_CONFIG_LINE, CORE_AUTH_CONFIG_LINE));
 
-            Statement statement = () -> Application.main(args("EUR", "HUF", "2.5", "--config", configFile.toAbsolutePath().toString()));
+            Statement statement = () -> Application.main(args("EUR", "HUF", AMOUNT, "--config", configFile.toAbsolutePath().toString()));
 
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("2.5 EUR = 5.0 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION);
             verifyRequest(mockWebServer.takeRequest(), "EUR", "HUF", CORE_API_KEY_2);
         }
 

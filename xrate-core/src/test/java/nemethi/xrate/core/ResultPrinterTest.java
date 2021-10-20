@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Currency;
 
 import static org.mockito.Mockito.verify;
@@ -16,11 +17,12 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class ResultPrinterTest {
 
-    private static final Currency FROM = Currency.getInstance("USD");
-    private static final Currency TO = Currency.getInstance("GBP");
-    private static final BigDecimal AMOUNT = new BigDecimal("2");
-    private static final BigDecimal RESULT = new BigDecimal("1.44");
+    private static final Currency FROM = Currency.getInstance("EUR");
+    private static final Currency TO = Currency.getInstance("HUF");
+    private static final BigDecimal AMOUNT = new BigDecimal("768.13");
+    private static final BigDecimal RESULT = new BigDecimal("278275.41");
     private static final ConversionResult CONVERSION_RESULT = new ConversionResult(FROM, TO, AMOUNT, RESULT);
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
     private static final String RESULT_FORMAT = "%s %s = %s %s";
     private static final String RATE_FORMAT = "1 %s = %s %s";
 
@@ -44,14 +46,18 @@ class ResultPrinterTest {
     }
 
     private String formattedResult() {
-        return String.format(RESULT_FORMAT, AMOUNT, FROM, RESULT, TO);
+        return String.format(RESULT_FORMAT, format(AMOUNT), FROM, format(RESULT), TO);
     }
 
     private String formattedRate() {
-        return String.format(RATE_FORMAT, FROM, CONVERSION_RESULT.getRate(), TO);
+        return String.format(RATE_FORMAT, FROM, format(CONVERSION_RESULT.getRate()), TO);
     }
 
     private String formattedInverseRate() {
-        return String.format(RATE_FORMAT, TO, CONVERSION_RESULT.getInverseRate(), FROM);
+        return String.format(RATE_FORMAT, TO, format(CONVERSION_RESULT.getInverseRate()), FROM);
+    }
+
+    private String format(BigDecimal number) {
+        return DECIMAL_FORMAT.format(number);
     }
 }

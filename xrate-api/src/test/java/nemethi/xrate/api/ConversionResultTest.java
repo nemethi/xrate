@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Currency;
 
@@ -19,7 +18,8 @@ class ConversionResultTest {
     private static final Currency TO = Currency.getInstance("GBP");
     private static final BigDecimal AMOUNT = BigDecimal.ONE;
     private static final BigDecimal RESULT = new BigDecimal("0.72");
-    private static final MathContext MATH_CONTEXT = new MathContext(3, RoundingMode.HALF_EVEN);
+    private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_EVEN;
+    private static final int NUMBER_OF_DECIMAL_PLACES = 2;
 
     private ConversionResult conversionResult;
 
@@ -39,7 +39,7 @@ class ConversionResultTest {
     @Test
     @DisplayName("getRate() returns the quotient of result divided by amount")
     void getRateWorks() {
-        BigDecimal expectedRate = RESULT.divide(AMOUNT, MATH_CONTEXT);
+        BigDecimal expectedRate = RESULT.divide(AMOUNT, NUMBER_OF_DECIMAL_PLACES, ROUNDING_MODE);
         BigDecimal rate = conversionResult.getRate();
         assertThat(rate).isEqualByComparingTo(expectedRate);
     }
@@ -54,7 +54,7 @@ class ConversionResultTest {
     @Test
     @DisplayName("getInverseRate() returns the quotient of amount divided by result")
     void getInverseRateWorks() {
-        BigDecimal expectedInverseRate = AMOUNT.divide(RESULT, MATH_CONTEXT);
+        BigDecimal expectedInverseRate = AMOUNT.divide(RESULT, NUMBER_OF_DECIMAL_PLACES, ROUNDING_MODE);
         BigDecimal inverseRate = conversionResult.getInverseRate();
         assertThat(inverseRate).isEqualByComparingTo(expectedInverseRate);
     }
