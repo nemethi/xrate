@@ -38,6 +38,9 @@ public class CurrConvApiClient {
             HttpRequest request = HttpRequest.newBuilder(uri).build();
             BigDecimal result = sendRequest(request, fromCurrency, toCurrency);
             return Optional.of(result);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Optional.empty();
         } catch (Exception e) {
             return Optional.empty();
         }

@@ -68,6 +68,17 @@ class CurrConvApiClientTest {
     }
 
     @Test
+    void returnsEmptyOptionalOnInterruption() throws IOException, InterruptedException {
+        when(httpClient.send(any(), any())).thenThrow(InterruptedException.class);
+
+        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+
+        assertThat(result).isNotPresent();
+        verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
+        assertHttpRequest();
+    }
+
+    @Test
     void returnsEmptyOptionalOnMalformedEndpointUri() {
         client = new CurrConvApiClient("[malformed");
 

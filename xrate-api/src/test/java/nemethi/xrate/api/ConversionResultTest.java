@@ -159,7 +159,7 @@ class ConversionResultTest {
         @Test
         void equalObjectsHaveSameHashCode() {
             var otherResult = new ConversionResult(FROM, TO, AMOUNT, RESULT);
-            assertThat(conversionResult.hashCode()).isEqualTo(otherResult.hashCode());
+            assertThat(conversionResult).hasSameHashCodeAs(otherResult);
         }
 
         @Test
