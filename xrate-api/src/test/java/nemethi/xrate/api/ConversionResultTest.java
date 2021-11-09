@@ -19,7 +19,7 @@ class ConversionResultTest {
     private static final BigDecimal AMOUNT = BigDecimal.ONE;
     private static final BigDecimal RESULT = new BigDecimal("0.72");
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_EVEN;
-    private static final int NUMBER_OF_DECIMAL_PLACES = 2;
+    private static final int NUMBER_OF_DECIMAL_PLACES = 4;
 
     private ConversionResult conversionResult;
 

@@ -22,7 +22,7 @@ class ResultPrinterTest {
     private static final BigDecimal AMOUNT = new BigDecimal("768.13");
     private static final BigDecimal RESULT = new BigDecimal("278275.41");
     private static final ConversionResult CONVERSION_RESULT = new ConversionResult(FROM, TO, AMOUNT, RESULT);
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.####");
     private static final String RESULT_FORMAT = "%s %s = %s %s";
     private static final String RATE_FORMAT = "1 %s = %s %s";
 

@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 
 public class ResultPrinter {
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.##");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###.####");
     private static final String RESULT_FORMAT = "%s %s = %s %s";
     private static final String RATE_FORMAT = "1 %s = %s %s";
 

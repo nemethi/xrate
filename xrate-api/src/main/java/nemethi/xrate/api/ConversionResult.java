@@ -17,7 +17,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class ConversionResult {
 
-    private static final int NUMBER_OF_DECIMAL_PLACES = 2;
+    private static final int NUMBER_OF_DECIMAL_PLACES = 4;
     private static final int PRECISION = 0;
     /**
      * Contains information about precision and rounding mode for numerical operations.
