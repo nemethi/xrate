@@ -1,5 +1,6 @@
 package nemethi.xrate.core;
 
+import nemethi.xrate.api.ConversionException;
 import nemethi.xrate.api.ConversionResult;
 import nemethi.xrate.api.CurrencyConverter;
 
@@ -8,7 +9,11 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 public class Xrate {
+
+    private static final String MISSING_RESULT_ERROR_MESSAGE = "Error: converter did not return any result";
 
     private final Configuration config;
     private final PluginLoader loader;
@@ -26,7 +31,7 @@ public class Xrate {
 
     public void convert(Currency from, Currency to, BigDecimal amount) {
         ConversionResult result = createConverter().convert(from, to, amount);
-        printer.print(result);
+        processResult(result);
     }
 
     private CurrencyConverter createConverter() {
@@ -49,5 +54,12 @@ public class Xrate {
         DefaultCurrencyConverter converter = new DefaultCurrencyConverter(client);
         converter.setAuthCredentials(authCredentials);
         return converter;
+    }
+
+    private void processResult(ConversionResult result) {
+        if (isNull(result)) {
+            throw new ConversionException(MISSING_RESULT_ERROR_MESSAGE);
+        }
+        printer.print(result);
     }
 }

@@ -20,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +36,7 @@ class XrateTest {
     private static final String AUTH_CREDS = "testAuthCreds";
     private static final String PLUGIN_AUTH_CREDS = "testPluginAuthCreds";
     private static final Exception EXPECTED_EXCEPTION = new ConversionException("testMessage");
+    private static final String MISSING_RESULT_ERROR_MESSAGE = "Error: converter did not return any result";
 
     @Mock
     private Configuration config;
@@ -116,5 +118,23 @@ class XrateTest {
         verify(config).getCoreAuthCredentials();
         verify(xrate).createDefaultConverter(any(), eq(AUTH_CREDS));
         verify(converter).convert(FROM, TO, AMOUNT);
+    }
+
+    @Test
+    void throwsExceptionOnNullResult() {
+        when(loader.findFirstPlugin()).thenReturn(Optional.of(converter));
+        when(config.getPluginAuthCredentials()).thenReturn(PLUGIN_AUTH_CREDS);
+        when(converter.convert(any(), any(), any())).thenReturn(null);
+
+        Throwable thrown = catchThrowable(() -> xrate.convert(FROM, TO, AMOUNT));
+
+        assertThat(thrown)
+                .isInstanceOf(ConversionException.class)
+                .hasMessage(MISSING_RESULT_ERROR_MESSAGE);
+        verify(loader).findFirstPlugin();
+        verify(config).getPluginAuthCredentials();
+        verify(converter).setAuthCredentials(PLUGIN_AUTH_CREDS);
+        verify(converter).convert(FROM, TO, AMOUNT);
+        verify(printer, never()).print(any());
     }
 }

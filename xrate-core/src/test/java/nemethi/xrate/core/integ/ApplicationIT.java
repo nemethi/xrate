@@ -2,8 +2,10 @@ package nemethi.xrate.core.integ;
 
 import com.github.stefanbirkner.systemlambda.Statement;
 import nemethi.xrate.core.Application;
+import nemethi.xrate.core.integ.util.NullResultCurrencyConverter;
 import nemethi.xrate.core.integ.util.ProviderConfigExtension;
 import nemethi.xrate.core.integ.util.TestCurrencyConverter;
+import nemethi.xrate.core.integ.util.UseConverter;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -44,6 +46,7 @@ class ApplicationIT {
     private static final String AMOUNT = "757.57";
     private static final String EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION = "1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n";
     private static final String EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION = AMOUNT + " EUR = 1,515.14 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n";
+    private static final String MISSING_RESULT_ERROR_MESSAGE = "xrate: Error: converter did not return any result\n";
 
     private ByteArrayOutputStream systemOut;
     private ByteArrayOutputStream systemErr;
@@ -119,6 +122,16 @@ class ApplicationIT {
             assertExitCode(statement, 0);
             assertThat(systemOut.toString()).isEqualToNormalizingNewlines(EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION);
             assertThat(TestCurrencyConverter.getAuthCredentials()).isEqualTo(PLUGIN_API_KEY_2);
+        }
+
+        @Test
+        @UseConverter(NullResultCurrencyConverter.class)
+        void convertWithPluginThatDoesNotObeyApiContract() throws Exception {
+            Statement statement = () -> Application.main(args());
+
+            assertExitCode(statement, 1);
+            assertThat(systemErr.toString()).isEqualToNormalizingNewlines(MISSING_RESULT_ERROR_MESSAGE);
+            assertThat(systemOut.toString()).isEmpty();
         }
     }
 
