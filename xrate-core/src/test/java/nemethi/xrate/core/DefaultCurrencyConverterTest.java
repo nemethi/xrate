@@ -8,9 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
@@ -28,7 +28,7 @@ class DefaultCurrencyConverterTest {
     private static final BigDecimal AMOUNT = BigDecimal.ONE;
     private static final BigDecimal RATE = new BigDecimal("1.5");
     private static final BigDecimal RESULT = AMOUNT.multiply(RATE, ConversionResult.MATH_CONTEXT);
-    private static final String ERROR_MESSAGE = "Could not convert currency using default third-party API.";
+    private static final String ERROR_MESSAGE = "Could not convert currency using default third-party API:";
 
     @Mock
     private CurrConvApiClient client;
@@ -42,8 +42,8 @@ class DefaultCurrencyConverterTest {
     }
 
     @Test
-    void multipliesAmountWithRateReturnedFromClient() {
-        when(client.getConversionRate(any(), any(), anyString())).thenReturn(Optional.of(RATE));
+    void multipliesAmountWithRateReturnedFromClient() throws IOException, InterruptedException {
+        when(client.getConversionRate(any(), any(), anyString())).thenReturn(RATE);
         ConversionResult expectedResult = new ConversionResult(FROM, TO, AMOUNT, RESULT);
 
         ConversionResult result = converter.convert(FROM, TO, AMOUNT);
@@ -53,14 +53,15 @@ class DefaultCurrencyConverterTest {
     }
 
     @Test
-    void throwsExceptionWhenRateIsNotPresent() {
-        when(client.getConversionRate(any(), any(), anyString())).thenReturn(Optional.empty());
+    void wrapsExceptionThrownByClient(@Mock IOException exception) throws IOException, InterruptedException {
+        when(client.getConversionRate(any(), any(), anyString())).thenThrow(exception);
 
         Throwable thrown = catchThrowable(() -> converter.convert(FROM, TO, AMOUNT));
 
         assertThat(thrown)
                 .isInstanceOf(ConversionException.class)
-                .hasMessage(ERROR_MESSAGE);
+                .hasMessage(ERROR_MESSAGE)
+                .hasCause(exception);
         verify(client).getConversionRate(FROM, TO, API_KEY);
     }
 }

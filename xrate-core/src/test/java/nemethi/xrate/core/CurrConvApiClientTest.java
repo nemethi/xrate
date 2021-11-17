@@ -1,5 +1,6 @@
 package nemethi.xrate.core;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,9 +19,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Currency;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -59,54 +60,54 @@ class CurrConvApiClientTest {
         when(httpClient.send(any(), any())).thenReturn(httpResponse);
         when(httpResponse.body()).thenReturn(responseBody);
 
-        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+        BigDecimal result = client.getConversionRate(FROM, TO, API_KEY);
 
-        assertThat(result).isPresent().hasValue(new BigDecimal(expectedRate));
+        assertThat(result).isEqualTo(new BigDecimal(expectedRate));
         verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
         verify(httpResponse).body();
         assertHttpRequest();
     }
 
     @Test
-    void returnsEmptyOptionalOnInterruption() throws IOException, InterruptedException {
-        when(httpClient.send(any(), any())).thenThrow(InterruptedException.class);
+    void throwsExceptionOnInterruption(@Mock InterruptedException exception) throws IOException, InterruptedException {
+        when(httpClient.send(any(), any())).thenThrow(exception);
 
-        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+        Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM, TO, API_KEY));
 
-        assertThat(result).isNotPresent();
+        assertThat(thrown).isEqualTo(exception);
         verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
         assertHttpRequest();
     }
 
     @Test
-    void returnsEmptyOptionalOnMalformedEndpointUri() {
+    void throwsExceptionOnMalformedEndpointUri() {
         client = new CurrConvApiClient("[malformed");
 
-        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+        Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM, TO, API_KEY));
 
-        assertThat(result).isNotPresent();
+        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void returnsEmptyOptionalOnHttpClientError() throws Exception {
-        when(httpClient.send(any(), any())).thenThrow(IOException.class);
+    void throwsExceptionOnHttpClientError(@Mock IOException exception) throws Exception {
+        when(httpClient.send(any(), any())).thenThrow(exception);
 
-        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+        Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM, TO, API_KEY));
 
-        assertThat(result).isNotPresent();
+        assertThat(thrown).isEqualTo(exception);
         verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
         assertHttpRequest();
     }
 
     @Test
-    @DisplayName("Returns an empty optional when the returned JSON doesn't contain the rate")
-    void returnsEmptyOptionalOnInvalidJson() throws Exception {
+    @DisplayName("Throws an exception when the returned JSON doesn't contain the rate")
+    void throwsExceptionOnInvalidJson() throws Exception {
         when(httpClient.send(any(), any())).thenReturn(httpResponse);
         when(httpResponse.body()).thenReturn("{}");
 
-        Optional<BigDecimal> result = client.getConversionRate(FROM, TO, API_KEY);
+        Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM, TO, API_KEY));
 
-        assertThat(result).isNotPresent();
+        assertThat(thrown).isInstanceOf(JSONException.class);
         verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
         verify(httpResponse).body();
         assertHttpRequest();

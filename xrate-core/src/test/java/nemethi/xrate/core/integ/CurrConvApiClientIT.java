@@ -4,6 +4,7 @@ import nemethi.xrate.core.CurrConvApiClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class CurrConvApiClientIT {
 
@@ -52,14 +53,12 @@ public class CurrConvApiClientIT {
     class HappyPath {
 
         @Test
-        void clientReturnsConversionRate() throws InterruptedException {
+        void clientReturnsConversionRate() throws InterruptedException, IOException {
             mockWebServer.enqueue(mockResponse());
 
-            Optional<BigDecimal> result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
+            BigDecimal result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
 
-            assertThat(result)
-                    .isPresent()
-                    .hasValue(EXPECTED_RATE);
+            assertThat(result).isEqualTo(EXPECTED_RATE);
             verifyRequest(mockWebServer.takeRequest());
         }
 
@@ -79,24 +78,24 @@ public class CurrConvApiClientIT {
     class UnhappyPaths {
 
         @Test
-        @DisplayName("When the server returns an error then the result is not present")
+        @DisplayName("When the server returns an error then an exception is thrown")
         void serverErrorResponse() throws InterruptedException {
             mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
-            Optional<BigDecimal> result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
+            Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY));
 
-            assertThat(result).isNotPresent();
+            assertThat(thrown).isInstanceOf(JSONException.class);
             verifyRequest(mockWebServer.takeRequest());
         }
 
         @Test
-        @DisplayName("When the returned JSON doesn't contain the rate then the result is not present")
+        @DisplayName("When the returned JSON doesn't contain the rate then an exception is thrown")
         void invalidResponse() throws InterruptedException {
             mockWebServer.enqueue(mockResponse());
 
-            Optional<BigDecimal> result = client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY);
+            Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY));
 
-            assertThat(result).isNotPresent();
+            assertThat(thrown).isInstanceOf(JSONException.class);
             verifyRequest(mockWebServer.takeRequest());
         }
 

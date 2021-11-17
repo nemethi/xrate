@@ -10,7 +10,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Currency;
-import java.util.Optional;
 
 public class CurrConvApiClient {
 
@@ -28,22 +27,14 @@ public class CurrConvApiClient {
         this.httpClient = httpClient;
     }
 
-    public Optional<BigDecimal> getConversionRate(Currency from, Currency to, String apiKey) {
+    public BigDecimal getConversionRate(Currency from, Currency to, String apiKey) throws IOException, InterruptedException {
         return getConversionRate(from.getCurrencyCode(), to.getCurrencyCode(), apiKey);
     }
 
-    private Optional<BigDecimal> getConversionRate(String fromCurrency, String toCurrency, String apiKey) {
-        try {
-            URI uri = buildUri(fromCurrency, toCurrency, apiKey);
-            HttpRequest request = HttpRequest.newBuilder(uri).build();
-            BigDecimal result = sendRequest(request, fromCurrency, toCurrency);
-            return Optional.of(result);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return Optional.empty();
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+    private BigDecimal getConversionRate(String fromCurrency, String toCurrency, String apiKey) throws IOException, InterruptedException {
+        URI uri = buildUri(fromCurrency, toCurrency, apiKey);
+        HttpRequest request = HttpRequest.newBuilder(uri).build();
+        return sendRequest(request, fromCurrency, toCurrency);
     }
 
     private URI buildUri(String from, String to, String apiKey) {

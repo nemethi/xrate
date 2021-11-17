@@ -13,4 +13,14 @@ public class ConversionException extends RuntimeException {
     public ConversionException(String message) {
         super(message);
     }
+
+    /**
+     * Constructs a new instance with specified message and cause.
+     *
+     * @param message the message
+     * @param cause   the cause
+     */
+    public ConversionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
