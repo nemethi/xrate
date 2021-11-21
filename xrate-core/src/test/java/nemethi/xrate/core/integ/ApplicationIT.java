@@ -47,7 +47,7 @@ class ApplicationIT {
     private static final String EXPECTED_OUTPUT_OF_DEFAULT_CONVERSION = "1 USD = 2 GBP\n1 USD = 2 GBP\n1 GBP = 0.5 USD\n";
     private static final String EXPECTED_OUTPUT_OF_SPECIFIC_CONVERSION = AMOUNT + " EUR = 1,515.14 HUF\n1 EUR = 2 HUF\n1 HUF = 0.5 EUR\n";
     private static final String MISSING_RESULT_ERROR_MESSAGE = "xrate: Error: converter did not return any result\n";
-    private static final Pattern DEFAULT_CONVERTER_ERROR_PATTERN = Pattern.compile("xrate: Could not convert currency using default third-party API:\\r?\\n.*", Pattern.DOTALL);
+    private static final Pattern DEFAULT_CONVERTER_ERROR_PATTERN = Pattern.compile("xrate: Could not convert currency using the default third-party API:\\r?\\n.*", Pattern.DOTALL);
 
     private ByteArrayOutputStream systemOut;
     private ByteArrayOutputStream systemErr;

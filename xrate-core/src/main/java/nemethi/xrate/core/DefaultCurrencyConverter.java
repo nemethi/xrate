@@ -10,7 +10,7 @@ import java.util.Currency;
 
 public class DefaultCurrencyConverter implements CurrencyConverter {
 
-    private static final String ERROR_MESSAGE = "Could not convert currency using default third-party API:";
+    private static final String ERROR_MESSAGE = "Could not convert currency using the default third-party API:";
     private final CurrConvApiClient client;
     private String authCredentials;
 

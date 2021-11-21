@@ -28,7 +28,7 @@ class DefaultCurrencyConverterTest {
     private static final BigDecimal AMOUNT = BigDecimal.ONE;
     private static final BigDecimal RATE = new BigDecimal("1.5");
     private static final BigDecimal RESULT = AMOUNT.multiply(RATE, ConversionResult.MATH_CONTEXT);
-    private static final String ERROR_MESSAGE = "Could not convert currency using default third-party API:";
+    private static final String ERROR_MESSAGE = "Could not convert currency using the default third-party API:";
 
     @Mock
     private CurrConvApiClient client;

@@ -37,6 +37,7 @@ class CurrConvApiClientTest {
     private static final String ENDPOINT_URI = "http://testUri";
     private static final String URI_TEMPLATE = ENDPOINT_URI + "?q=%s_%s&apiKey=%s&compact=ultra";
     private static final URI EXPECTED_URI = URI.create(String.format(URI_TEMPLATE, FROM, TO, API_KEY));
+    private static final String EXCHANGE_RATE_NOT_FOUND_TEMPLATE = "The exchange rate of %s to %s is not found";
 
     @Mock
     private HttpClient httpClient;
@@ -100,14 +101,31 @@ class CurrConvApiClientTest {
     }
 
     @Test
-    @DisplayName("Throws an exception when the returned JSON doesn't contain the rate")
-    void throwsExceptionOnInvalidJson() throws Exception {
+    @DisplayName("Throws an exception with a formal message when the returned JSON doesn't contain the rate")
+    void throwsExceptionWithFormalMessageOnInvalidJson() throws Exception {
         when(httpClient.send(any(), any())).thenReturn(httpResponse);
         when(httpResponse.body()).thenReturn("{}");
 
         Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM, TO, API_KEY));
 
+        assertThat(thrown)
+                .isInstanceOf(JSONException.class)
+                .hasMessage(EXCHANGE_RATE_NOT_FOUND_TEMPLATE, FROM, TO);
+        verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
+        verify(httpResponse).body();
+        assertHttpRequest();
+    }
+
+    @Test
+    @DisplayName("Throws an exception with the original message on other JSON-related errors")
+    void throwsExceptionOnOtherJsonRelatedError() throws IOException, InterruptedException {
+        when(httpClient.send(any(), any())).thenReturn(httpResponse);
+        when(httpResponse.body()).thenReturn("");
+
+        Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM, TO, API_KEY));
+
         assertThat(thrown).isInstanceOf(JSONException.class);
+        assertThat(thrown.getMessage()).isNotEqualTo(String.format(EXCHANGE_RATE_NOT_FOUND_TEMPLATE, FROM, TO));
         verify(httpClient).send(requestCaptor.capture(), eq(BodyHandlers.ofString()));
         verify(httpResponse).body();
         assertHttpRequest();

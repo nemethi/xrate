@@ -28,6 +28,7 @@ public class CurrConvApiClientIT {
     private static final String API_KEY = "testApiKey";
     private static final String CONTENT_TYPE_HEADER_KEY = "Content-Type";
     private static final String APPLICATION_JSON_HEADER_VALUE = "application/json";
+    private static final String EXCHANGE_RATE_NOT_FOUND_TEMPLATE = "The exchange rate of %s to %s is not found";
 
     private static MockWebServer mockWebServer;
     private CurrConvApiClient client;
@@ -95,7 +96,9 @@ public class CurrConvApiClientIT {
 
             Throwable thrown = catchThrowable(() -> client.getConversionRate(FROM_CURRENCY, TO_CURRENCY, API_KEY));
 
-            assertThat(thrown).isInstanceOf(JSONException.class);
+            assertThat(thrown)
+                    .isInstanceOf(JSONException.class)
+                    .hasMessage(EXCHANGE_RATE_NOT_FOUND_TEMPLATE, FROM_CURRENCY, TO_CURRENCY);
             verifyRequest(mockWebServer.takeRequest());
         }
 
