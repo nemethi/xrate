@@ -4,13 +4,13 @@
   <parent>
     <artifactId>xrate</artifactId>
     <groupId>nemethi</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
 
   <name>Test coverage report aggregation</name>
   <artifactId>coverage</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <properties>
     <unit.coverage.report.directory>${project.build.directory}/jacoco-aggregate-unit</unit.coverage.report.directory>
@@ -21,17 +21,17 @@
     <dependency>
       <groupId>nemethi</groupId>
       <artifactId>xrate-api</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>nemethi</groupId>
       <artifactId>xrate-core</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>nemethi</groupId>
       <artifactId>plugin-exchangerateapi</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
   </dependencies>
 

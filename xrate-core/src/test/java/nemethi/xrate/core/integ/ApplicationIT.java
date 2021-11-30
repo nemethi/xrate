@@ -305,7 +305,7 @@ class ApplicationIT {
 
         private void printVersion(Statement statement) throws Exception {
             assertExitCode(statement, 0);
-            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("1.0-SNAPSHOT\n");
+            assertThat(systemOut.toString()).isEqualToNormalizingNewlines("1.0\n");
         }
     }
 

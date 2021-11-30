@@ -5,18 +5,18 @@
   <parent>
     <artifactId>xrate</artifactId>
     <groupId>nemethi</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
 
   <artifactId>plugin-exchangerateapi</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <dependencies>
     <dependency>
       <groupId>nemethi</groupId>
       <artifactId>xrate-api</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.juneau</groupId>
