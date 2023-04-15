@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 import static java.util.stream.Collectors.joining;
 
 @Command(name = "xrate", description = "Get exchange rates and convert currencies using third-party services.%n",
-        mixinStandardHelpOptions = true, version = "1.0")
+        mixinStandardHelpOptions = true, version = "1.0.1")
 public class Application implements Callable<Integer> {
 
     private static final String DEFAULT_CONFIG_FILE = "xrate.properties";

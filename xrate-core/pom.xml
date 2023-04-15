@@ -10,7 +10,7 @@
 
   <artifactId>xrate-core</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>1.0.1</version>
 
   <properties>
     <main.class>nemethi.xrate.core.Application</main.class>
